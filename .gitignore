@@ -1,0 +1,19 @@
+# Compiled objects
+*.o
+*.out
+*.a
+*.so
+
+# Executables
+lab5_mpi
+Lab5-MPI
+bh
+a.out
+
+# Editor/OS artifacts
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
