@@ -1,22 +1,16 @@
 # Compiler
-CXX = mpic++
-CXXFLAGS = -O2 -Wall -Wextra -std=c++17
+CXX      = mpic++
+CXXFLAGS = -O2 -Wall -Wextra -std=c++17 -Iinclude
 
 # Executable name
-TARGET = lab5_seq
+TARGET   = lab5_mpi
 
 # Source files
-SRCS = main.cpp \
-       bh.cpp \
-       io.cpp \
-       integrator.cpp \
-       argparse.cpp
-
-# Header files (not compiled, but trigger rebuild)
-HDRS = bh.h \
-       io.h \
-       integrator.h \
-       argparse.h
+SRCS = src/main.cpp \
+       src/bh.cpp   \
+       src/io.cpp   \
+       src/integrator.cpp \
+       src/argparse.cpp
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)
@@ -28,13 +22,9 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-# Compile .cpp → .o
-%.o: %.cpp $(HDRS)
-	$(CXX) $(CXXFLAGS) -c $<
-
-# Run the program (example)
-run: $(TARGET)
-	./$(TARGET) -i input.txt -o out.txt -s 10 -t 0.5 -d 0.01
+# Compile .cpp 
+src/%.o: src/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Clean builds
 clean:
