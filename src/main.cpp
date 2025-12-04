@@ -1,6 +1,7 @@
 //main.cpp
 #include <iostream>
 #include <vector>
+#include <iomanip>
 #include "bh.h"
 #include "io.h"
 #include "integrator.h"
@@ -8,15 +9,13 @@
 #include <mpi.h>
 using namespace std;
 
-//getting different numbers now when i run it...
-// something i need to look into: 
-//      the leap frog force calculation looks different maybe this is why numbers are different
-
+//still getting slightly different numbers. anyways next lets makek the csv files and graphs.
 
 int main(int argc, char **argv) {
 
     //lets do mpi after i get the base working
     MPI_Init(&argc, &argv);
+    double start = MPI_Wtime();
 
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -56,9 +55,9 @@ int main(int argc, char **argv) {
 
     //next steps: divide up into different ranks and do work rank 0 can just do stuff in serial if needed
 
-    if (rank == 0) {
-        cout << "Lab5 MPI program starting with " << size << " processes, N = " << N << ".\n";
-    }
+    // if (rank == 0) {
+    //     cout << "Lab5 MPI program starting with " << size << " processes, N = " << N << ".\n";
+    // }
 
     
     // options_t opts;
@@ -81,6 +80,9 @@ int main(int argc, char **argv) {
     // }
     // vector<double> Fx(bodies.size(), 0.0);
     // vector<double> Fy(bodies.size(), 0.0);
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    double sim_start = MPI_Wtime();
 
     for (int s = 0; s < opts.steps; s++){
         Node* root = BuildTree(body_ptrs);
@@ -117,8 +119,14 @@ int main(int argc, char **argv) {
         FreeTree(root);
         MPI_Bcast(bodies.data(), N * sizeof(Body), MPI_BYTE, 0, MPI_COMM_WORLD);
     }
+
+    double end = MPI_Wtime();
+    double elapsed = end - start;
+    double sim_elapsed = end - sim_start;
     if (rank == 0) {
         write_output(opts.output_file, bodies);
+        cout << fixed << setprecision(6) << elapsed << endl;
+        cout << fixed << setprecision(6) << sim_elapsed << endl;
     }
     //write_output(opts.output_file, bodies);
 
