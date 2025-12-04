@@ -9,6 +9,8 @@
 using namespace std;
 
 //getting different numbers now when i run it...
+// something i need to look into: 
+//      the leap frog force calculation looks different maybe this is why numbers are different
 
 
 int main(int argc, char **argv) {

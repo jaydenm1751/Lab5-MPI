@@ -8,11 +8,13 @@ void UpdateBody(Body* b, double Fx, double Fy, double dt){
     double ax = Fx / b->mass;
     double ay = Fy / b->mass;
 
+    // update position first
+    b->x += b->vx * dt + 0.5 * ax * dt * dt;
+    b->y += b->vy * dt + 0.5 * ay * dt * dt;
+
+    // new velocity
     b->vx += ax * dt;
     b->vy += ay * dt;
-
-    b->x += b->vx * dt;
-    b->y += b->vy * dt;
 
     if (b->x < 0 || b->x > 4 || b->y < 0 || b->y > 4) {
         b->mass = -1; //lost
