@@ -1,6 +1,7 @@
 # Compiler
 CXX      = mpic++
-CXXFLAGS = -O2 -Wall -Wextra -std=c++17 -Iinclude
+CXXFLAGS = -O3 -ffast-math -march=native -Wall -Wextra -std=c++17 -Iinclude
+
 
 # Executable name
 TARGET   = lab5_mpi

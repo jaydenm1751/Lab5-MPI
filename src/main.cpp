@@ -83,41 +83,45 @@ int main(int argc, char **argv) {
 
     MPI_Barrier(MPI_COMM_WORLD);
     double sim_start = MPI_Wtime();
+    vector<double> Fx(N, 0.0);
+    vector<double> Fy(N, 0.0);
 
     for (int s = 0; s < opts.steps; s++){
         Node* root = BuildTree(body_ptrs);
         ComputeMassDistribution(root);
-        vector<double> Fx_local(N, 0.0);
-        vector<double> Fy_local(N, 0.0);
+        fill(Fx.begin(), Fx.end(), 0.0);
+        fill(Fy.begin(), Fy.end(), 0.0);
 
         for(int i = local_start; i < local_end; i++){
             Body* b = body_ptrs[i];
             if (b->mass < 0.0) continue;
-            ComputeForceOnBody(b, root, opts.theta, Fx_local[i], Fy_local[i]);
+            ComputeForceOnBody(b, root, opts.theta, Fx[i], Fy[i]);
         }
 
-        vector<double> Fx_total, Fy_total;
-        if (rank == 0){
-            Fx_total.resize(N);
-            Fy_total.resize(N);
-        }
+        // vector<double> Fx_total, Fy_total;
+        // if (rank == 0){
+        //     Fx_total.resize(N);
+        //     Fy_total.resize(N);
+        // }
 
-        MPI_Reduce(Fx_local.data(),
-                   rank == 0 ? Fx_total.data() : nullptr,
-                   N, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-        MPI_Reduce(Fy_local.data(),
-                   rank == 0 ? Fy_total.data() : nullptr,
-                   N, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+        MPI_Allreduce(MPI_IN_PLACE, Fx.data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+        MPI_Allreduce(MPI_IN_PLACE, Fy.data(), N, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
+        // MPI_Reduce(Fx_local.data(),
+        //            rank == 0 ? Fx_total.data() : nullptr,
+        //            N, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+        // MPI_Reduce(Fy_local.data(),
+        //            rank == 0 ? Fy_total.data() : nullptr,
+        //            N, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
         
-        if (rank == 0) {
-            for (int i = 0; i < N; i++){
-                Body* b = body_ptrs[i];
-                if (b->mass < 0.0) continue;
-                UpdateBody(b, Fx_total[i], Fy_total[i], opts.dt);
-            }
-        }        
+        for (int i = 0; i < N; i++){
+            Body* b = body_ptrs[i];
+            if (b->mass < 0.0) continue;
+            UpdateBody(b, Fx[i], Fy[i], opts.dt);
+        }
+
         FreeTree(root);
-        MPI_Bcast(bodies.data(), N * sizeof(Body), MPI_BYTE, 0, MPI_COMM_WORLD);
+        // MPI_Bcast(bodies.data(), N * sizeof(Body), MPI_BYTE, 0, MPI_COMM_WORLD);
     }
 
     double end = MPI_Wtime();

@@ -19,17 +19,17 @@ DT = 0.005
 CONFIGS = [
     {
         "input_file": "nb-10.txt",
-        "steps": 1000,
-        "max_np": 16,   # can go up to 16 for small input
+        "steps": 100,
+        "max_np": 8,   # can go up to 16 for small input
     },
     {
         "input_file": "nb-100.txt",
-        "steps": 1000,
-        "max_np": 16,
+        "steps": 100,
+        "max_np": 8,
     },
     {
         "input_file": "nb-100000.txt",
-        "steps": 1000,  # maybe 100 if Codio is slow
+        "steps": 100,  # maybe 100 if Codio is slow
         "max_np": 8,    # spec: at most 8 processors for large input
     },
 ]
